@@ -19,7 +19,7 @@ jobs:
         dotnet-version: '8.0' 
 
     - name: Restore NuGet packages
-      run: dotnet restore
+      run: dotnet restore ./Contos/Contoso.sln
 
     - name: Build SQL Server project
       run: dotnet build ./Contos/Contoso.sln --configuration Release
