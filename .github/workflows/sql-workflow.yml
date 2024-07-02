@@ -13,33 +13,34 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Set up .NET
-      uses: actions/setup-dotnet@v2
-      with:
-        dotnet-version: '8.0' 
+    - name: Install Visual Studio Build Tools
+      run: |
+        choco install visualstudio2019buildtools -y
+        choco install visualstudio2019-workload-data -y
+        choco install visualstudio2019-workload-manageddesktop -y
+        choco install visualstudio2019-workload-netcoretools -y
 
     - name: Restore NuGet packages
-      run: dotnet restore ./Contoso/Contoso.sln
+      run: msbuild /t:restore ./Contoso/Contoso.sln
 
     - name: Build SQL Server project
-      run: dotnet build ./Contoso/Contoso.sln --configuration Debug
+      run: msbuild .Contoso/Contoso/Contoso.sln /p:Configuration=Release
 
     - name: Generate DACPAC
       run: |
-        dotnet build ./Contoso/Contoso/Contoso.sqlproj /p:Configuration=Debug /p:OutputPath=./output
+        msbuild .Contoso/Contoso/Contoso/Contoso.sqlproj /p:Configuration=Release /p:OutputPath=./output
         echo "DACPAC generated in ./output"
-    
+
     - name: Install sqlcmd
       run: |
         Invoke-WebRequest -Uri https://aka.ms/sqlcmd-msi -OutFile sqlcmd.msi
         Start-Process msiexec.exe -ArgumentList '/i sqlcmd.msi /quiet /norestart' -Wait
-        
+
     - name: Deploy to SQL Server
       env:
-        SQL_SERVER: XI039
-        SQL_DATABASE: DmContosoTest
-        SQL_USERNAME: test
-        SQL_PASSWORD: test1
+        SQL_SERVER: ${{ secrets.SQL_SERVER }}
+        SQL_DATABASE: ${{ secrets.SQL_DATABASE }}
+        SQL_USERNAME: ${{ secrets.SQL_USERNAME }}
+        SQL_PASSWORD: ${{ secrets.SQL_PASSWORD }}
       run: |
-        sqlcmd -S $env:SQL_SERVER -d $env:SQL_DATABASE -U $env:SQL_USERNAME -P $env:SQL_PASSWORD -i ./output/Contoso_Create.sql
-
+        sqlcmd -S $env:SQL_SERVER -d $env:SQL_DATABASE -U $env:SQL_USERNAME -P $env:SQL_PASSWORD -i ./output/deploy.sql
