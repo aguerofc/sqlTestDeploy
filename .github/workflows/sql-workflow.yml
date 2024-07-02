@@ -20,15 +20,20 @@ jobs:
         choco install visualstudio2019-workload-manageddesktop -y
         choco install visualstudio2019-workload-netcoretools -y
 
+    - name: Add msbuild to PATH
+      run: |
+        $msbuildPath = "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin"
+        echo "##vso[task.prependpath]$msbuildPath"
+
     - name: Restore NuGet packages
       run: msbuild /t:restore ./Contoso/Contoso.sln
 
     - name: Build SQL Server project
-      run: msbuild .Contoso/Contoso/Contoso.sln /p:Configuration=Release
+      run: msbuild ./Contoso/Contoso.sln /p:Configuration=Release
 
     - name: Generate DACPAC
       run: |
-        msbuild .Contoso/Contoso/Contoso/Contoso.sqlproj /p:Configuration=Release /p:OutputPath=./output
+        msbuild ./Contoso/Contoso/Contoso.sqlproj /p:Configuration=Release /p:OutputPath=./output
         echo "DACPAC generated in ./output"
 
     - name: Install sqlcmd
