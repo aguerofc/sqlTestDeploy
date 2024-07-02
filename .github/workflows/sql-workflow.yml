@@ -19,16 +19,21 @@ jobs:
         dotnet-version: '8.0' 
 
     - name: Restore NuGet packages
-      run: dotnet restore ./Contoso/Contoso.sln
+      run: dotnet restore /Contoso/Contoso.sln
 
     - name: Build SQL Server project
-      run: dotnet build ./Contoso/Contoso.sln --configuration Debug
+      run: dotnet build /Contoso/Contoso.sln --configuration Debug
 
     - name: Generate DACPAC
       run: |
-        dotnet build ./Contoso/Contoso/Contoso.sqlproj /p:Configuration=Debug /p:OutputPath=./output
+        dotnet build /Contoso/Contoso/Contoso.sqlproj /p:Configuration=Debug /p:OutputPath=./output
         echo "DACPAC generated in ./output"
-
+    
+    - name: Install sqlcmd
+      run: |
+        Invoke-WebRequest -Uri https://aka.ms/sqlcmd-msi -OutFile sqlcmd.msi
+        Start-Process msiexec.exe -ArgumentList '/i sqlcmd.msi /quiet /norestart' -Wait
+        
     - name: Deploy to SQL Server
       env:
         SQL_SERVER: XI039
