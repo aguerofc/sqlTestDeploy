@@ -9,5 +9,5 @@ jobs:
     - uses: azure/sql-action@v2.2.1
       with:        
         connection-string: ${{ secrets.SQL_CONNECTION_STRING }}
-        path: './Database.sqlproj'
+        path: './././Contoso.sqlproj'
         action: 'publish'
