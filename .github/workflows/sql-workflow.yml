@@ -19,10 +19,10 @@ jobs:
         dotnet-version: '8.0' 
 
     - name: Restore NuGet packages
-      run: dotnet restore ./Contos/Contoso.sln
+      run: dotnet restore ./Contoso/Contoso.sln
 
     - name: Build SQL Server project
-      run: dotnet build ./Contos/Contoso.sln --configuration Release
+      run: dotnet build ./Contoso/Contoso.sln --configuration Debug
 
     - name: Generate DACPAC
       run: |
