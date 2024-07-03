@@ -1,0 +1,42 @@
+name: Deploy SQL Server Project
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up MSBuild
+      uses: microsoft/setup-msbuild@v1.0.3
+
+    - name: Restore NuGet packages
+      run: msbuild /t:restore ./Contoso/Contoso.sln
+
+    - name: Build SQL Server project
+      run: msbuild ./Contoso/Contoso.sln /p:Configuration=Release
+
+    - name: Generate DACPAC
+      run: |
+        msbuild ./Contoso/Contoso/Contoso.sqlproj /p:Configuration=Release /p:OutputPath=./output
+        echo "DACPAC generated in ./output"
+
+    - name: Install sqlcmd
+      run: |
+        Invoke-WebRequest -Uri https://aka.ms/sqlcmd-msi -OutFile sqlcmd.msi
+        Start-Process msiexec.exe -ArgumentList '/i sqlcmd.msi /quiet /norestart' -Wait
+
+    - name: Deploy to SQL Server
+      env:
+        SQL_SERVER: XI039
+        SQL_DATABASE: DmContosoTest
+        SQL_USERNAME: testing
+        SQL_PASSWORD: testing1
+      run: |
+        sqlcmd -S $env:SQL_SERVER -d $env:SQL_DATABASE -U $env:SQL_USERNAME -P $env:SQL_PASSWORD -i  ./output/Contoso.sql
