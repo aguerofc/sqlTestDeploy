@@ -22,16 +22,8 @@ jobs:
     - name: Build SQL Server project
       run: msbuild ./Contoso/Contoso.sln /p:Configuration=Release
     
-    - name: Install PowerShell 7
-      run: |
-        Invoke-WebRequest -Uri https://github.com/PowerShell/PowerShell/releases/download/v7.2.0/PowerShell-7.2.0-win-x64.msi -OutFile PowerShell-7.2.0-win-x64.msi
-        Start-Process msiexec.exe -ArgumentList '/i', 'PowerShell-7.2.0-win-x64.msi', '/quiet', '/norestart' -NoNewWindow -Wait
-
-    - name: Install SqlPackage
-      shell: pwsh
-      run: |
-        Invoke-WebRequest -Uri https://aka.ms/sqlpackage -OutFile sqlpackage.zip
-        Expand-Archive sqlpackage.zip -DestinationPath ./sqlpackage
+    - name: Install SqlPackage using Chocolatey
+      run: choco install sqlpackage --confirm
     
     - name: Generate DACPAC
       run: |
