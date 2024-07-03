@@ -39,4 +39,4 @@ jobs:
         SQL_USERNAME: testing
         SQL_PASSWORD: testing1
       run: |
-        sqlcmd -S $env:SQL_SERVER -d $env:SQL_DATABASE -U $env:SQL_USERNAME -P $env:SQL_PASSWORD -i ./output/Contoso_Create.sql
+        sqlcmd -S $env:SQL_SERVER -d $env:SQL_DATABASE -U $env:SQL_USERNAME -P $env:SQL_PASSWORD -i /output/Contoso_Create.sql
