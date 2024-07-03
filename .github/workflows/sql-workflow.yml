@@ -26,7 +26,11 @@ jobs:
       run: |
         msbuild ./Contoso/Contoso/Contoso.sqlproj /p:Configuration=Release /p:OutputPath=./output
         echo "DACPAC generated in ./output"
-
+        
+    - name: Generate Deployment Script
+      run: |
+        msbuild ./Contoso/Contoso/Contoso.sqlproj /p:Configuration=Release /t:GenerateDeployScript /p:DeployScriptFile=./output/deploy.sql
+        echo "Deployment script generated in ./output/deploy.sql"
     - name: Install sqlcmd
       run: |
         Invoke-WebRequest -Uri https://aka.ms/sqlcmd-msi -OutFile sqlcmd.msi
@@ -39,4 +43,4 @@ jobs:
         SQL_USERNAME: testing
         SQL_PASSWORD: testing1
       run: |
-        sqlcmd -S $env:SQL_SERVER -d $env:SQL_DATABASE -U $env:SQL_USERNAME -P $env:SQL_PASSWORD -i  Contoso_Create.sql
+        sqlcmd -S $env:SQL_SERVER -d $env:SQL_DATABASE -U $env:SQL_USERNAME -P $env:SQL_PASSWORD -i  ./output/deploy.sql
