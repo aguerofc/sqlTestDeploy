@@ -21,22 +21,17 @@ jobs:
 
     - name: Build SQL Server project
       run: msbuild ./Contoso/Contoso.sln /p:Configuration=Release
-
-    - name: Generate DACPAC
-      run: |
-        msbuild ./Contoso/Contoso/Contoso.sqlproj /p:Configuration=Release /p:OutputPath=./output
-        echo "DACPAC generated in ./output"
-        
+    
     - name: Install SqlPackage
       run: |
         Invoke-WebRequest -Uri https://aka.ms/sqlpackage -OutFile sqlpackage.zip
         Expand-Archive sqlpackage.zip -DestinationPath ./sqlpackage
-
-    - name: Generate Deployment Script
+    
+    - name: Generate DACPAC
       run: |
-        ./sqlpackage/sqlpackage.exe /Action:Script /SourceFile:"./Contoso/Contoso/bin/Release/Contoso.dacpac" /TargetFile:"./output/deploy.sql" /TargetDatabaseName:"DmContosoTest"
-        echo "Deployment script generated in ./output/deploy.sql"
-
+        msbuild ./Contoso/Contoso/Contoso.sqlproj /p:Configuration=Release /p:OutputPath=./output
+        echo "DACPAC generated in ./output"
+   
     - name: Install sqlcmd
       run: |
         Invoke-WebRequest -Uri https://aka.ms/sqlcmd-msi -OutFile sqlcmd.msi
@@ -49,4 +44,4 @@ jobs:
         SQL_USERNAME: testing
         SQL_PASSWORD: testing1
       run: |
-        sqlcmd -S $env:SQL_SERVER -d $env:SQL_DATABASE -U $env:SQL_USERNAME -P $env:SQL_PASSWORD -i  ./output/deploy.sql
+        ./sqlpackage/sqlpackage.exe /Action:Publish /SourceFile:"./output/Contoso.dacpac" /TargetServerName:"$env:SQL_SERVER" /TargetDatabaseName:"$env:SQL_DATABASE" /TargetUser:"$env:SQL_USERNAME" /TargetPassword:"$env:SQL_PASSWORD" /p:DropObjectsNotInSource=True
