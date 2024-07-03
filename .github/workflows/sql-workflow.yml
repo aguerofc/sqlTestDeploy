@@ -42,4 +42,4 @@ jobs:
         SQL_USERNAME: testing
         SQL_PASSWORD: testing1
       run: |
-        ./sqlpackage/sqlpackage.exe /Action:Publish /SourceFile:"./output/Contoso.dacpac" /TargetServerName:"$env:SQL_SERVER" /TargetDatabaseName:"$env:SQL_DATABASE" /TargetUser:"$env:SQL_USERNAME" /TargetPassword:"$env:SQL_PASSWORD" /p:DropObjectsNotInSource=True
+        sqlpackage /Action:Publish /SourceFile:"./output/Contoso.dacpac" /TargetServerName:"$env:SQL_SERVER" /TargetDatabaseName:"$env:SQL_DATABASE" /TargetUser:"$env:SQL_USERNAME" /TargetPassword:"$env:SQL_PASSWORD" /p:DropObjectsNotInSource=True
